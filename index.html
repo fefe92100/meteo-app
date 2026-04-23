@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Météo App</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 24px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: #64748b;
+      margin-bottom: 40px;
+      font-size: 14px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .search {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 48px;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    input {
+      flex: 1;
+      padding: 14px 20px;
+      border-radius: 12px;
+      border: 1px solid #1e293b;
+      background: #1e293b;
+      color: #e2e8f0;
+      font-size: 16px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus { border-color: #38bdf8; }
+
+    button {
+      padding: 14px 24px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      color: white;
+      font-size: 16px;
+      font-family: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    button:hover { opacity: 0.85; }
+
+    .ville-nom {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .grille {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .carte {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .carte:hover {
+      transform: translateY(-4px);
+      border-color: #38bdf8;
+    }
+
+    .carte .jour {
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #64748b;
+      margin-bottom: 12px;
+    }
+
+    .carte .emoji { font-size: 2rem; margin-bottom: 12px; }
+
+    .carte .tmax {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #f97316;
+    }
+
+    .carte .tmin {
+      font-size: 1rem;
+      color: #38bdf8;
+      margin-bottom: 12px;
+    }
+
+    .carte .detail {
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.8;
+    }
+
+    .erreur {
+      color: #f87171;
+      margin-top: 20px;
+    }
+
+    .loading { color: #64748b; margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+  <h1>🌤️ Météo</h1>
+  <p class="subtitle">Prévisions 7 jours</p>
+
+  <div class="search">
+    <input type="text" id="ville" placeholder="Entrez une ville..." value="Paris" />
+    <button onclick="chargerMeteo()">Rechercher</button>
+  </div>
+
+  <div id="ville-nom" class="ville-nom"></div>
+  <div id="resultats" class="grille"></div>
+  <div id="message"></div>
+
+  <script>
+    const jours = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+
+    function getEmoji(pluie, vent) {
+      if (pluie > 5) return '🌧️';
+      if (pluie > 0) return '🌦️';
+      if (vent > 40) return '💨';
+      return '☀️';
+    }
+
+    async function chargerMeteo() {
+      const ville = document.getElementById('ville').value.trim();
+      if (!ville) return;
+
+      document.getElementById('message').innerHTML = '<p class="loading">Chargement...</p>';
+      document.getElementById('resultats').innerHTML = '';
+      document.getElementById('ville-nom').textContent = '';
+
+      try {
+        const res = await fetch(`http://localhost:8000/meteo?ville=${encodeURIComponent(ville)}`);
+        const data = await res.json();
+
+        if (data.erreur) {
+          document.getElementById('message').innerHTML = `<p class="erreur">❌ ${data.erreur}</p>`;
+          return;
+        }
+
+        document.getElementById('message').innerHTML = '';
+        document.getElementById('ville-nom').textContent = `📍 ${data.ville}, ${data.pays}`;
+
+        const grille = document.getElementById('resultats');
+        grille.innerHTML = '';
+
+        data.previsions.forEach(jour => {
+          const date = new Date(jour.date);
+          const nomJour = jours[date.getDay()];
+          const emoji = getEmoji(jour.pluie_mm, jour.vent_kmh);
+
+          grille.innerHTML += `
+            <div class="carte">
+              <div class="jour">${nomJour} ${date.getDate()}/${date.getMonth()+1}</div>
+              <div class="emoji">${emoji}</div>
+              <div class="tmax">${jour.temp_max}°</div>
+              <div class="tmin">${jour.temp_min}°</div>
+              <div class="detail">💧 ${jour.pluie_mm}mm<br>💨 ${jour.vent_kmh}km/h</div>
+            </div>
+          `;
+        });
+
+      } catch(e) {
+        document.getElementById('message').innerHTML = '<p class="erreur">❌ Impossible de contacter l\'API</p>';
+      }
+    }
+
+    // Chargement automatique au démarrage
+    chargerMeteo();
+  </script>
+
+</body>
+</html>
