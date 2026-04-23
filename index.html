@@ -173,7 +173,7 @@
       document.getElementById('ville-nom').textContent = '';
 
       try {
-        const res = await fetch(`http://localhost:8000/meteo?ville=${encodeURIComponent(ville)}`);
+        const res = await fetch(`https://meteo-app-production-b386.up.railway.app/meteo?ville=${encodeURIComponent(ville)}`);
         const data = await res.json();
 
         if (data.erreur) {
