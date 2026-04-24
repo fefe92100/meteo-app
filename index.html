@@ -7,157 +7,45 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Space Grotesk', sans-serif;
-      background: #0f172a;
-      color: #e2e8f0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 48px 24px;
-    }
-    h1 {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-      background: linear-gradient(135deg, #38bdf8, #818cf8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+    body { font-family: 'Space Grotesk', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 48px 24px; }
+    h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 8px; background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .subtitle { color: #64748b; margin-bottom: 40px; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; }
-    .card {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 16px;
-      padding: 32px;
-      width: 100%;
-      max-width: 400px;
-      margin-bottom: 24px;
-    }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 32px; width: 100%; max-width: 400px; margin-bottom: 24px; }
     .tabs { display: flex; gap: 8px; margin-bottom: 24px; }
-    .tab {
-      flex: 1;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #334155;
-      background: transparent;
-      color: #64748b;
-      font-family: inherit;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .tab.active {
-      background: linear-gradient(135deg, #38bdf8, #818cf8);
-      color: white;
-      border-color: transparent;
-    }
+    .tab { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: transparent; color: #64748b; font-family: inherit; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+    .tab.active { background: linear-gradient(135deg, #38bdf8, #818cf8); color: white; border-color: transparent; }
     .field { margin-bottom: 16px; }
     .field label { display: block; font-size: 13px; color: #64748b; margin-bottom: 6px; }
-    .field input {
-      width: 100%;
-      padding: 12px 16px;
-      border-radius: 8px;
-      border: 1px solid #334155;
-      background: #0f172a;
-      color: #e2e8f0;
-      font-size: 15px;
-      font-family: inherit;
-      outline: none;
-      transition: border-color 0.2s;
-    }
+    .field input { width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #e2e8f0; font-size: 15px; font-family: inherit; outline: none; transition: border-color 0.2s; }
     .field input:focus { border-color: #38bdf8; }
-    .btn {
-      width: 100%;
-      padding: 14px;
-      border-radius: 8px;
-      border: none;
-      background: linear-gradient(135deg, #38bdf8, #818cf8);
-      color: white;
-      font-size: 16px;
-      font-family: inherit;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity 0.2s;
-      margin-top: 8px;
-    }
-    .btn:hover { opacity: 0.85; }
-    .btn-logout {
-      background: transparent;
-      border: 1px solid #334155;
-      color: #64748b;
-      width: auto;
-      padding: 8px 16px;
-      font-size: 13px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-family: inherit;
-    }
+    .btn { width: 100%; padding: 14px; border-radius: 8px; border: none; background: linear-gradient(135deg, #38bdf8, #818cf8); color: white; font-size: 16px; font-family: inherit; font-weight: 600; cursor: pointer; margin-top: 8px; }
+    .btn-small { background: transparent; border: 1px solid #334155; color: #64748b; width: auto; padding: 8px 16px; font-size: 13px; border-radius: 8px; cursor: pointer; font-family: inherit; }
+    .btn-fav { background: transparent; border: 1px solid #fbbf24; color: #fbbf24; padding: 8px 16px; font-size: 13px; border-radius: 8px; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+    .btn-fav.active { background: #fbbf24; color: #0f172a; }
     .message { margin-top: 12px; font-size: 13px; text-align: center; }
     .error { color: #f87171; }
     .success { color: #4ade80; }
-    .search {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 32px;
-      width: 100%;
-      max-width: 500px;
-    }
-    .search input {
-      flex: 1;
-      padding: 14px 20px;
-      border-radius: 12px;
-      border: 1px solid #1e293b;
-      background: #1e293b;
-      color: #e2e8f0;
-      font-size: 16px;
-      font-family: inherit;
-      outline: none;
-    }
-    .search input:focus { border-color: #38bdf8; }
-    .search button {
-      padding: 14px 24px;
-      border-radius: 12px;
-      border: none;
-      background: linear-gradient(135deg, #38bdf8, #818cf8);
-      color: white;
-      font-size: 16px;
-      font-family: inherit;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .ville-nom { font-size: 1.5rem; font-weight: 700; margin-bottom: 24px; text-align: center; }
-    .grille {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 16px;
-      width: 100%;
-      max-width: 900px;
-    }
-    .carte {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 16px;
-      padding: 20px;
-      text-align: center;
-      transition: transform 0.2s, border-color 0.2s;
-    }
+    .search { display: flex; gap: 12px; margin-bottom: 16px; width: 100%; max-width: 600px; }
+    .search input { flex: 1; padding: 14px 20px; border-radius: 12px; border: 1px solid #1e293b; background: #1e293b; color: #e2e8f0; font-size: 16px; font-family: inherit; outline: none; }
+    .search button { padding: 14px 24px; border-radius: 12px; border: none; background: linear-gradient(135deg, #38bdf8, #818cf8); color: white; font-size: 16px; font-family: inherit; font-weight: 600; cursor: pointer; }
+    .ville-nom { font-size: 1.5rem; font-weight: 700; margin-bottom: 12px; text-align: center; }
+    .fav-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; width: 100%; max-width: 900px; margin-bottom: 32px; }
+    .carte { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 20px; text-align: center; transition: transform 0.2s, border-color 0.2s; }
     .carte:hover { transform: translateY(-4px); border-color: #38bdf8; }
     .carte .jour { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: #64748b; margin-bottom: 12px; }
     .carte .emoji { font-size: 2rem; margin-bottom: 12px; }
     .carte .tmax { font-size: 1.8rem; font-weight: 700; color: #f97316; }
     .carte .tmin { font-size: 1rem; color: #38bdf8; margin-bottom: 12px; }
     .carte .detail { font-size: 12px; color: #64748b; line-height: 1.8; }
-    .user-bar {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 24px;
-      font-size: 14px;
-      color: #64748b;
-    }
+    .user-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; font-size: 14px; color: #64748b; }
     .user-bar span { color: #38bdf8; font-weight: 600; }
+    .favoris-section { width: 100%; max-width: 600px; margin-bottom: 32px; }
+    .favoris-title { font-size: 14px; color: #64748b; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+    .favoris-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .fav-chip { background: #1e293b; border: 1px solid #334155; border-radius: 20px; padding: 6px 16px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: border-color 0.2s; }
+    .fav-chip:hover { border-color: #38bdf8; }
+    .fav-chip .del { color: #f87171; font-size: 16px; line-height: 1; }
     #auth-section { width: 100%; max-width: 400px; }
     #meteo-section { width: 100%; display: flex; flex-direction: column; align-items: center; }
   </style>
@@ -167,21 +55,18 @@
 <h1>🌤️ Météo</h1>
 <p class="subtitle">Prévisions 7 jours</p>
 
-<!-- AUTH -->
 <div id="auth-section">
   <div class="card">
     <div class="tabs">
-      <button class="tab active" onclick="switchTab('login')">Connexion</button>
-      <button class="tab" onclick="switchTab('register')">Inscription</button>
+      <button class="tab active" onclick="switchTab('login', this)">Connexion</button>
+      <button class="tab" onclick="switchTab('register', this)">Inscription</button>
     </div>
-
     <div id="login-form">
       <div class="field"><label>Nom d'utilisateur</label><input type="text" id="login-username" placeholder="fefe"/></div>
       <div class="field"><label>Mot de passe</label><input type="password" id="login-password" placeholder="••••••••"/></div>
       <button class="btn" onclick="login()">Se connecter</button>
       <div id="login-msg" class="message"></div>
     </div>
-
     <div id="register-form" style="display:none">
       <div class="field"><label>Nom d'utilisateur</label><input type="text" id="reg-username" placeholder="fefe"/></div>
       <div class="field"><label>Email</label><input type="email" id="reg-email" placeholder="fefe@email.com"/></div>
@@ -192,11 +77,15 @@
   </div>
 </div>
 
-<!-- METEO -->
 <div id="meteo-section" style="display:none">
   <div class="user-bar">
     <span id="username-display"></span>
-    <button class="btn-logout" onclick="logout()">Déconnexion</button>
+    <button class="btn-small" onclick="logout()">Déconnexion</button>
+  </div>
+
+  <div class="favoris-section">
+    <div class="favoris-title">⭐ Mes villes favorites</div>
+    <div class="favoris-list" id="favoris-list"><span style="color:#475569;font-size:13px">Aucun favori pour l'instant</span></div>
   </div>
 
   <div class="search">
@@ -204,7 +93,11 @@
     <button onclick="chargerMeteo()">Rechercher</button>
   </div>
 
-  <div id="ville-nom" class="ville-nom"></div>
+  <div class="fav-bar">
+    <div id="ville-nom" class="ville-nom"></div>
+    <button class="btn-fav" id="btn-fav" onclick="toggleFavori()" style="display:none">⭐ Ajouter aux favoris</button>
+  </div>
+
   <div id="resultats" class="grille"></div>
   <div id="meteo-msg" class="message"></div>
 </div>
@@ -214,10 +107,12 @@
   const jours = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
   let token = localStorage.getItem('token');
   let username = localStorage.getItem('username');
+  let villeActuelle = null;
+  let favoris = [];
 
-  function switchTab(tab) {
+  function switchTab(tab, el) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    event.target.classList.add('active');
+    el.classList.add('active');
     document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
     document.getElementById('register-form').style.display = tab === 'register' ? 'block' : 'none';
   }
@@ -236,8 +131,7 @@
       if (!res.ok) { msg.innerHTML = `<span class="error">❌ ${data.detail}</span>`; return; }
       localStorage.setItem('token', data.access_token);
       localStorage.setItem('username', u);
-      token = data.access_token;
-      username = u;
+      token = data.access_token; username = u;
       showMeteo();
     } catch(e) { msg.innerHTML = '<span class="error">❌ Erreur de connexion</span>'; }
   }
@@ -256,23 +150,73 @@
       const data = await res.json();
       if (!res.ok) { msg.innerHTML = `<span class="error">❌ ${data.detail}</span>`; return; }
       msg.innerHTML = '<span class="success">✅ Compte créé ! Connectez-vous.</span>';
-      switchTab('login');
     } catch(e) { msg.innerHTML = '<span class="error">❌ Erreur</span>'; }
   }
 
   function logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
+    localStorage.removeItem('token'); localStorage.removeItem('username');
     token = null; username = null;
     document.getElementById('auth-section').style.display = 'block';
     document.getElementById('meteo-section').style.display = 'none';
   }
 
-  function showMeteo() {
+  async function showMeteo() {
     document.getElementById('auth-section').style.display = 'none';
     document.getElementById('meteo-section').style.display = 'flex';
     document.getElementById('username-display').textContent = `👋 Bonjour ${username}`;
+    await chargerFavoris();
     chargerMeteo();
+  }
+
+  async function chargerFavoris() {
+    try {
+      const res = await fetch(`${API}/favoris`, { headers: {'Authorization': `Bearer ${token}`} });
+      favoris = await res.json();
+      afficherFavoris();
+    } catch(e) {}
+  }
+
+  function afficherFavoris() {
+    const list = document.getElementById('favoris-list');
+    if (!favoris.length) { list.innerHTML = '<span style="color:#475569;font-size:13px">Aucun favori pour l\'instant</span>'; return; }
+    list.innerHTML = favoris.map(f => `
+      <div class="fav-chip" onclick="chargerMeteoVille('${f.ville}')">
+        📍 ${f.ville}
+        <span class="del" onclick="event.stopPropagation();supprimerFavori('${f.ville}')">×</span>
+      </div>
+    `).join('');
+    updateBtnFavori();
+  }
+
+  function updateBtnFavori() {
+    const btn = document.getElementById('btn-fav');
+    if (!villeActuelle) return;
+    const estFavori = favoris.some(f => f.ville === villeActuelle.nom);
+    btn.textContent = estFavori ? '✅ En favoris' : '⭐ Ajouter aux favoris';
+    btn.classList.toggle('active', estFavori);
+  }
+
+  async function toggleFavori() {
+    if (!villeActuelle) return;
+    const estFavori = favoris.some(f => f.ville === villeActuelle.nom);
+    if (estFavori) {
+      await supprimerFavori(villeActuelle.nom);
+    } else {
+      await fetch(`${API}/favoris`, {
+        method: 'POST',
+        headers: {'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json'},
+        body: JSON.stringify({ville: villeActuelle.nom, pays: villeActuelle.pays, latitude: String(villeActuelle.latitude), longitude: String(villeActuelle.longitude)})
+      });
+      await chargerFavoris();
+    }
+  }
+
+  async function supprimerFavori(ville) {
+    await fetch(`${API}/favoris/${encodeURIComponent(ville)}`, {
+      method: 'DELETE',
+      headers: {'Authorization': `Bearer ${token}`}
+    });
+    await chargerFavoris();
   }
 
   function getEmoji(pluie, vent) {
@@ -282,12 +226,18 @@
     return '☀️';
   }
 
+  async function chargerMeteoVille(nom) {
+    document.getElementById('ville').value = nom;
+    await chargerMeteo();
+  }
+
   async function chargerMeteo() {
     const ville = document.getElementById('ville').value.trim();
     if (!ville) return;
     document.getElementById('meteo-msg').innerHTML = '<span style="color:#64748b">Chargement...</span>';
     document.getElementById('resultats').innerHTML = '';
     document.getElementById('ville-nom').textContent = '';
+    document.getElementById('btn-fav').style.display = 'none';
     try {
       const res = await fetch(`${API}/meteo?ville=${encodeURIComponent(ville)}`, {
         headers: {'Authorization': `Bearer ${token}`}
@@ -297,6 +247,9 @@
       if (data.erreur) { document.getElementById('meteo-msg').innerHTML = `<span class="error">❌ ${data.erreur}</span>`; return; }
       document.getElementById('meteo-msg').innerHTML = '';
       document.getElementById('ville-nom').textContent = `📍 ${data.ville}, ${data.pays}`;
+      document.getElementById('btn-fav').style.display = 'inline-block';
+      villeActuelle = { nom: data.ville, pays: data.pays, latitude: data.latitude, longitude: data.longitude };
+      updateBtnFavori();
       const grille = document.getElementById('resultats');
       grille.innerHTML = '';
       data.previsions.forEach(jour => {
@@ -315,7 +268,6 @@
     } catch(e) { document.getElementById('meteo-msg').innerHTML = '<span class="error">❌ Impossible de contacter l\'API</span>'; }
   }
 
-  // Auto-login si token existant
   if (token) showMeteo();
 </script>
 </body>
