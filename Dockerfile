@@ -2,7 +2,7 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-RUN pip install fastapi uvicorn sqlalchemy psycopg2-binary python-jose passlib bcrypt python-multipart
+RUN pip install fastapi uvicorn sqlalchemy psycopg2-binary python-jose bcrypt python-multipart
 
 COPY api_meteo.py .
 COPY database.py .
