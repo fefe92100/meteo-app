@@ -1,8 +1,14 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from sqlalchemy.orm import Session
+from pydantic import BaseModel
 import urllib.request
 import urllib.parse
 import json
+
+from database import get_db, init_db
+from auth import verify_password, create_token, verify_token, get_user, create_user
 
 app = FastAPI()
 
@@ -13,6 +19,44 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+# Initialiser la base de données au démarrage
+@app.on_event("startup")
+def startup():
+    init_db()
+
+# Modèles
+class RegisterData(BaseModel):
+    username: str
+    email: str
+    password: str
+
+# Routes auth
+@app.post("/register")
+def register(data: RegisterData, db: Session = Depends(get_db)):
+    if get_user(db, data.username):
+        raise HTTPException(status_code=400, detail="Utilisateur déjà existant")
+    user = create_user(db, data.username, data.email, data.password)
+    return {"message": f"Compte créé pour {user.username}"}
+
+@app.post("/login")
+def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = get_user(db, form.username)
+    if not user or not verify_password(form.password, user.hashed_password):
+        raise HTTPException(status_code=401, detail="Identifiants incorrects")
+    token = create_token({"sub": user.username})
+    return {"access_token": token, "token_type": "bearer"}
+
+@app.get("/me")
+def me(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    username = verify_token(token)
+    if not username:
+        raise HTTPException(status_code=401, detail="Token invalide")
+    user = get_user(db, username)
+    return {"username": user.username, "email": user.email}
+
+# Route météo protégée
 def chercher_ville(nom):
     nom_encode = urllib.parse.quote(nom)
     url = f"https://geocoding-api.open-meteo.com/v1/search?name={nom_encode}&count=1&language=fr"
@@ -29,7 +73,11 @@ def chercher_ville(nom):
     }
 
 @app.get("/meteo")
-def meteo(ville: str = "Paris"):
+def meteo(ville: str = "Paris", token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    username = verify_token(token)
+    if not username:
+        raise HTTPException(status_code=401, detail="Connectez-vous pour accéder à la météo")
+
     lieu = chercher_ville(ville)
     if not lieu:
         return {"erreur": "Ville introuvable"}
