@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -7,7 +7,7 @@ import urllib.request
 import urllib.parse
 import json
 
-from database import get_db, init_db
+from database import get_db, init_db, Favori
 from auth import verify_password, create_token, verify_token, get_user, create_user
 
 app = FastAPI()
@@ -21,18 +21,30 @@ app.add_middleware(
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
-# Initialiser la base de données au démarrage
 @app.on_event("startup")
 def startup():
     init_db()
 
-# Modèles
 class RegisterData(BaseModel):
     username: str
     email: str
     password: str
 
-# Routes auth
+class FavoriData(BaseModel):
+    ville: str
+    pays: str
+    latitude: str
+    longitude: str
+
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    username = verify_token(token)
+    if not username:
+        raise HTTPException(status_code=401, detail="Token invalide")
+    user = get_user(db, username)
+    if not user:
+        raise HTTPException(status_code=401, detail="Utilisateur introuvable")
+    return user
+
 @app.post("/register")
 def register(data: RegisterData, db: Session = Depends(get_db)):
     if get_user(db, data.username):
@@ -49,14 +61,34 @@ def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get
     return {"access_token": token, "token_type": "bearer"}
 
 @app.get("/me")
-def me(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    username = verify_token(token)
-    if not username:
-        raise HTTPException(status_code=401, detail="Token invalide")
-    user = get_user(db, username)
+def me(user=Depends(get_current_user)):
     return {"username": user.username, "email": user.email}
 
-# Route météo protégée
+# Favoris
+@app.get("/favoris")
+def get_favoris(user=Depends(get_current_user), db: Session = Depends(get_db)):
+    return user.favoris
+
+@app.post("/favoris")
+def add_favori(data: FavoriData, user=Depends(get_current_user), db: Session = Depends(get_db)):
+    existant = db.query(Favori).filter(Favori.user_id == user.id, Favori.ville == data.ville).first()
+    if existant:
+        raise HTTPException(status_code=400, detail="Ville déjà en favoris")
+    favori = Favori(user_id=user.id, ville=data.ville, pays=data.pays, latitude=str(data.latitude), longitude=str(data.longitude))
+    db.add(favori)
+    db.commit()
+    return {"message": f"{data.ville} ajouté aux favoris"}
+
+@app.delete("/favoris/{ville}")
+def delete_favori(ville: str, user=Depends(get_current_user), db: Session = Depends(get_db)):
+    favori = db.query(Favori).filter(Favori.user_id == user.id, Favori.ville == ville).first()
+    if not favori:
+        raise HTTPException(status_code=404, detail="Favori introuvable")
+    db.delete(favori)
+    db.commit()
+    return {"message": f"{ville} retiré des favoris"}
+
+# Météo
 def chercher_ville(nom):
     nom_encode = urllib.parse.quote(nom)
     url = f"https://geocoding-api.open-meteo.com/v1/search?name={nom_encode}&count=1&language=fr"
@@ -73,11 +105,7 @@ def chercher_ville(nom):
     }
 
 @app.get("/meteo")
-def meteo(ville: str = "Paris", token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    username = verify_token(token)
-    if not username:
-        raise HTTPException(status_code=401, detail="Connectez-vous pour accéder à la météo")
-
+def meteo(ville: str = "Paris", user=Depends(get_current_user), db: Session = Depends(get_db)):
     lieu = chercher_ville(ville)
     if not lieu:
         return {"erreur": "Ville introuvable"}
@@ -105,5 +133,7 @@ def meteo(ville: str = "Paris", token: str = Depends(oauth2_scheme), db: Session
     return {
         "ville": lieu["nom"],
         "pays": lieu["pays"],
+        "latitude": lieu["latitude"],
+        "longitude": lieu["longitude"],
         "previsions": previsions
     }

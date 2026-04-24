@@ -1,6 +1,6 @@
-from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, relationship
 import os
 
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:aVUIwDNCXGxbQRSqcqLLjOhbxCCLHuel@postgres.railway.internal:5432/railway")
@@ -15,6 +15,17 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+    favoris = relationship("Favori", back_populates="user")
+
+class Favori(Base):
+    __tablename__ = "favoris"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    ville = Column(String)
+    pays = Column(String)
+    latitude = Column(String)
+    longitude = Column(String)
+    user = relationship("User", back_populates="favoris")
 
 def get_db():
     db = SessionLocal()
